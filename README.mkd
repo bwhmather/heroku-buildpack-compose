@@ -1,0 +1,18 @@
+
+Heroku buildpack: Compose
+=========================
+
+A buildpack to run multiple buildpacks in sequence.
+Unlike [heroku-buildpack-multi](https://github.com/ddollar/heroku-buildpack-multi), heroku-buildpack-compose combines the output of the release `script` of each child buildpack to produce the final output.
+
+The contents of the `config_vars` key are added to the environment of subsequent buildpacks.
+
+
+Usage
+-----
+
+By default heroku-buildpack-compose reads a list of buildpack url's from a `.buildpacks` file in the root of the application repository.  
+
+
+
+

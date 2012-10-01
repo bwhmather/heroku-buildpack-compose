@@ -1,0 +1,93 @@
+#!/usr/bin/env ruby
+# -----------------------------------------------------------------------------
+# A heroku buildpack for composing other buildpacks
+# Copyright (c) 2012 - Ben Mather
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <http://www.gnu.org/licenses/>.
+# -----------------------------------------------------------------------------
+
+
+require 'yaml'
+
+build_dir = ARGV[0]
+cache_dir = ARGV[1]
+
+
+release = {
+    addons => []
+    config_vars => {}
+    default_process_types => {}
+}
+
+
+File.open("#{build_dir}/.buildpacks", "r") do |buildpacks|
+    buildpacks.each do |buildpack|
+        Dir.mktmpdir do |tmp_dir|
+            buildpack_dir = "#{tmp_dir}/buildpack"
+
+            url, *extra = buildpack.split '#'
+            branch = extra.join
+
+            `git clone #{url} #{buildpack_dir} >/dev/null 2>&1`
+
+            Dir.chdir buildpack_dir do
+
+                if branch != ''
+                    `git checkout #{branch} >/dev/null 2>&1`
+                end
+
+                `chmod +x ./bin/detect`
+                `chmod +x ./bin/compile`
+                `chmod +x ./bin/release`
+
+                `./bin/detect #{ARGV[0]}`
+
+                if $?.to_i == 0
+                    # run the buildpack
+                    ENV_backup = ENV
+                    ENV.update(release["config_vars"])
+                    `./bin/compile #{build_dir} #{cache_dir} 2>&1`
+                    ENV = ENV_backup
+
+                    if $?.to_i != 0
+                        indent "buildpack failed"
+                        exit 1
+                    end
+
+                    # update release info
+                    tmp_release = `./bin/release #{build_dir}`)
+                    tmp_release = YAML.load_stream(tmp_release)
+
+                    release["addons"].append(
+                                tmp_release.fetch("addons", []))
+
+                    release["config_vars"].update(
+                                tmp_release.fetch("config_vars", {}))
+
+                    release["default_process_types"].update(
+                                tmp_release.fetch("default_process_types", {}))
+
+                else
+                    indent "buildpack retrieved  from #{buildpack} claimed not to apply to this app"
+                    exit 1
+                end
+            end
+        end
+    end
+end
+
+# TODO
+write release file
+
+
