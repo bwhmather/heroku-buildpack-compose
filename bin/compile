@@ -21,6 +21,18 @@
 require 'yaml'
 require 'tmpdir'
 
+def indent(str)
+  str.split("\n").each do |line|
+    puts "       #{line}"
+  end
+end
+
+def arrow(str)
+  str.split("\n").each do |line|
+    puts "-----> #{line}"
+  end
+end
+
 build_dir = ARGV[0]
 cache_dir = ARGV[1]
 
@@ -32,41 +44,55 @@ release = {
 }
 
 
-File.open("#{build_dir}/.buildpacks", "r") do |buildpacks|
+File::open("#{build_dir}/.buildpacks", "r") do |buildpacks|
     buildpacks.each do |buildpack|
-        Dir.mktmpdir do |tmp_dir|
+        Dir::mktmpdir "child_buildpack_" do |tmp_dir|
             buildpack_dir = "#{tmp_dir}/buildpack"
 
+            buildpack.chomp!
             url, *extra = buildpack.split '#'
             branch = extra.join
 
-            `git clone #{url} #{buildpack_dir} >/dev/null 2>&1`
+            if branch != ''
+                branch = "--branch #{branch}"
+            end
 
-            Dir.chdir buildpack_dir do
+            arrow "Fetching child buildpack"
+            `git clone --depth 1 #{branch} #{url} #{buildpack_dir}`
 
-                if branch != ''
-                    `git checkout #{branch} >/dev/null 2>&1`
-                end
+            Dir::chdir buildpack_dir do
 
                 `chmod +x ./bin/detect`
                 `chmod +x ./bin/compile`
                 `chmod +x ./bin/release`
 
-                `./bin/detect #{ARGV[0]}`
+                name = `./bin/detect #{ARGV[0]}`.chomp
+                arrow "#{name} app detected"
 
                 if $?.to_i == 0
                     # run the buildpack
-                    `./bin/compile #{build_dir} #{cache_dir} 2>&1`
+                    arrow "Executing #{name} buildpack"
+
+                    indent `./bin/compile #{build_dir} #{cache_dir} 2>&1`
 
                     if $?.to_i != 0
-                        indent "buildpack failed"
+                        arrow "Child buildpack compile script failed"
                         exit 1
                     end
+
                     # update release info
                     tmp_release = `./bin/release #{build_dir}`
-                    tmp_release = YAML.load_stream(tmp_release)
 
-                    release["addons"].append(
+                    if $?.to_i != 0
+                        arrow "Child buildpack release script failed"
+                        exit 1
+                    end
+
+
+                    tmp_release = YAML::load(tmp_release)
+
+
+                    release["addons"].concat(
                                 tmp_release.fetch("addons", []))
 
                     release["config_vars"].update(
@@ -74,6 +100,10 @@ File.open("#{build_dir}/.buildpacks", "r") do |buildpacks|
 
                     release["default_process_types"].update(
                                 tmp_release.fetch("default_process_types", {}))
+
+                    release["config_vars"].each do |key,value|
+                        release["config_vars"][key] = String value
+                    end
 
                     # Add new configuration variables to environment
                     ENV.update(release["config_vars"])
@@ -86,6 +116,10 @@ File.open("#{build_dir}/.buildpacks", "r") do |buildpacks|
     end
 end
 
+arrow "Writing release file"
 File.open("#{build_dir}/.heroku-buildpack-compose_release_info", "w") do |release_file|
+    indent release.to_yaml
     release_file.syswrite(release.to_yaml)
 end
+
+arrow "Completed succesfully"

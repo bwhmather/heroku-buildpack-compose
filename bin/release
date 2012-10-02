@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # -----------------------------------------------------------------------------
 # A heroku buildpack for composing other buildpacks
 # Copyright (c) 2012 - Ben Mather
