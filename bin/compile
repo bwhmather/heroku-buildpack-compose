@@ -25,9 +25,9 @@ cache_dir = ARGV[1]
 
 
 release = {
-    addons => []
-    config_vars => {}
-    default_process_types => {}
+    "addons" => []
+    "config_vars" => {}
+    "default_process_types" => {}
 }
 
 
