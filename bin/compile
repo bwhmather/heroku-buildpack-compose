@@ -85,7 +85,6 @@ File.open("#{build_dir}/.buildpacks", "r") do |buildpacks|
     end
 end
 
-# TODO
-write release file
-
-
+File.open("#{build_dir}/.heroku-buildpack-compose_release_info", "w") do |release_file|
+    release_file.syswrite(release.to_yaml)
+end
