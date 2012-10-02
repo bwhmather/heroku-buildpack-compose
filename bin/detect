@@ -17,10 +17,9 @@
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
-
 build_dir = ARGV[0]
 
-if exist?("#{build_dir}/.buildpacks")
+if File.exist?("#{build_dir}/.buildpacks")
     puts "Compose"
     exit 0
 else
