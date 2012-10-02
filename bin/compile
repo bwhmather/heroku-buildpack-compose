@@ -55,16 +55,12 @@ File.open("#{build_dir}/.buildpacks", "r") do |buildpacks|
 
                 if $?.to_i == 0
                     # run the buildpack
-                    ENV_backup = ENV
-                    ENV.update(release["config_vars"])
                     `./bin/compile #{build_dir} #{cache_dir} 2>&1`
-                    ENV = ENV_backup
 
                     if $?.to_i != 0
                         indent "buildpack failed"
                         exit 1
                     end
-
                     # update release info
                     tmp_release = `./bin/release #{build_dir}`)
                     tmp_release = YAML.load_stream(tmp_release)
@@ -78,6 +74,8 @@ File.open("#{build_dir}/.buildpacks", "r") do |buildpacks|
                     release["default_process_types"].update(
                                 tmp_release.fetch("default_process_types", {}))
 
+                    # Add new configuration variables to environment
+                    ENV.update(release["config_vars"])
                 else
                     indent "buildpack retrieved  from #{buildpack} claimed not to apply to this app"
                     exit 1
