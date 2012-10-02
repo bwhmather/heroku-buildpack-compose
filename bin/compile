@@ -62,7 +62,7 @@ File.open("#{build_dir}/.buildpacks", "r") do |buildpacks|
                         exit 1
                     end
                     # update release info
-                    tmp_release = `./bin/release #{build_dir}`)
+                    tmp_release = `./bin/release #{build_dir}`
                     tmp_release = YAML.load_stream(tmp_release)
 
                     release["addons"].append(
