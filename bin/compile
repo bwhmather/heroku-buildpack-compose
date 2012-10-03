@@ -43,6 +43,7 @@ end
 build_dir = ARGV[0]
 cache_dir = ARGV[1]
 
+buildpacks_file = ENV.fetch("BUILDPACKS_FILE", ".buildpacks")
 
 release = {
     "addons" => [],
@@ -51,7 +52,7 @@ release = {
 }
 
 
-File::open("#{build_dir}/.buildpacks", "r") do |buildpacks|
+File::open("#{build_dir}/#{buildpacks_file}", "r") do |buildpacks|
     buildpacks.each do |buildpack|
         Dir::mktmpdir "child_buildpack_" do |tmp_dir|
             buildpack_dir = "#{tmp_dir}/buildpack"
