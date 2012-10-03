@@ -22,16 +22,23 @@ require 'yaml'
 require 'tmpdir'
 
 def indent(str)
-  str.split("\n").each do |line|
-    puts "       #{line}"
-  end
+    str.split("\n").each do |line|
+        puts "       #{line}"
+    end
 end
 
 def arrow(str)
-  str.split("\n").each do |line|
-    puts "-----> #{line}"
-  end
+    str.split("\n").each do |line|
+        puts "-----> #{line}"
+    end
 end
+
+def error(str)
+    str.split("\n").each do |line|
+        puts " !     #{line}"
+    end
+end
+
 
 build_dir = ARGV[0]
 cache_dir = ARGV[1]
@@ -76,7 +83,7 @@ File::open("#{build_dir}/.buildpacks", "r") do |buildpacks|
                     indent `./bin/compile #{build_dir} #{cache_dir} 2>&1`
 
                     if $?.to_i != 0
-                        arrow "Child buildpack compile script failed"
+                        error "Child buildpack compile script failed"
                         exit 1
                     end
 
@@ -84,7 +91,7 @@ File::open("#{build_dir}/.buildpacks", "r") do |buildpacks|
                     tmp_release = `./bin/release #{build_dir}`
 
                     if $?.to_i != 0
-                        arrow "Child buildpack release script failed"
+                        error "Child buildpack release script failed"
                         exit 1
                     end
 
@@ -108,7 +115,7 @@ File::open("#{build_dir}/.buildpacks", "r") do |buildpacks|
                     # Add new configuration variables to environment
                     ENV.update(release["config_vars"])
                 else
-                    indent "buildpack retrieved  from #{buildpack} claimed not to apply to this app"
+                    error "buildpack retrieved  from #{buildpack} claimed not to apply to this app"
                     exit 1
                 end
             end
@@ -118,7 +125,6 @@ end
 
 arrow "Writing release file"
 File.open("#{build_dir}/.heroku-buildpack-compose_release_info", "w") do |release_file|
-    indent release.to_yaml
     release_file.syswrite(release.to_yaml)
 end
 
