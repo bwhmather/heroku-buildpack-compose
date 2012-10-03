@@ -16,7 +16,7 @@ Usage
 By default heroku-buildpack-compose reads a list of buildpacks from a `.buildpacks` file in the root of the application repository.
 Buildpacks are described by the url of a git repository and spaced one per line.
 
-To read buildpacks from a different file, specify it's path (relative to the repository root) in the `BUILDPACKS_FILE` environment variable.
+To read buildpacks from a different file, specify it's path (relative to the repository root) in the `BUILDPACKS_FILE` environment variable (Note: at the present time, passing configuration to buildpacks through environment variables requires that the [user-env-compile](https://devcenter.heroku.com/articles/labs-user-env-compile) labs plugin be enabled).
 
 
 
