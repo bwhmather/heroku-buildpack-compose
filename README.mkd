@@ -3,9 +3,7 @@ Heroku buildpack: Compose
 =========================
 
 A buildpack to run multiple buildpacks in sequence.
-Unlike [heroku-buildpack-multi](https://github.com/ddollar/heroku-buildpack-multi), heroku-buildpack-compose combines the output of the release `script` of each child buildpack to produce the final output.
-Default targets and configuration variables defined by later buildpack take priority.
-Requirements are simply concatenated with no deduplication.
+Unlike [heroku-buildpack-multi](https://github.com/ddollar/heroku-buildpack-multi), heroku-buildpack-compose combines the output of the `release` script of each child buildpack to produce the final output.  Default targets and configuration variables defined by later buildpack take priority.  Requirements are simply concatenated with no deduplication.
 
 The contents of the `config_vars` key are added to the environment after each step and are visible when checking out and executing subsequent buildpacks.
 
@@ -13,11 +11,20 @@ The contents of the `config_vars` key are added to the environment after each st
 Usage
 -----
 
-By default heroku-buildpack-compose reads a list of buildpacks from a `.buildpacks` file in the root of the application repository.
-Buildpacks are described by the url of a git repository and spaced one per line.
+By default heroku-buildpack-compose reads a list of buildpacks from a `.buildpacks` file in the root of the application repository.  Buildpacks are described by the url of a git repository and spaced one per line.  To read buildpacks from a different file, specify it's path (relative to the repository root) in the `BUILDPACKS_FILE` environment variable (Note: at present, passing configuration to buildpacks through environment variables requires the [user-env-compile](https://devcenter.heroku.com/articles/labs-user-env-compile) labs extension).
 
-To read buildpacks from a different file, specify it's path (relative to the repository root) in the `BUILDPACKS_FILE` environment variable (Note: at present, passing configuration to buildpacks through environment variables requires the [user-env-compile](https://devcenter.heroku.com/articles/labs-user-env-compile) labs extension).
-
+It is highly recommended that you use your own fork as updates may inadvertently break backwards compatibility and heroku provides no obvious way of versioning buildpacks.
 
 
+See Also
+--------
 
+This buildpack was intended to be used with the [ssh buildpack](https://github.com/bwhmather/heroku-buildpack-ssh/) to enable loading of buildpacks from private repositories.  If there are any others I would be happy to list them here.
+
+
+Bugs
+----
+
+Please report any bugs to using the [issue tracker](https://github.com/bwhmather/heroku-buildpack-compose/issues).
+
+Pull requests are welcome.
