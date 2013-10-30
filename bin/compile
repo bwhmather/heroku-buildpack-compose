@@ -97,14 +97,13 @@ File::open("#{build_dir}/#{buildpacks_file}", "r") do |buildpacks|
                     end
 
                     if tmp_release = YAML::load(tmp_release)
-                        release["addons"].concat(
-                                    tmp_release.fetch("addons", []))
+                        release["addons"].concat(tmp_release["addons"] or [])
 
                         release["default_process_types"].update(
-                                    tmp_release.fetch("default_process_types", {}))
+                                    tmp_release["default_process_types"] or {})
 
                         release["config_vars"].update(
-                                    tmp_release.fetch("config_vars", {}))
+                                    tmp_release["config_vars"] or {})
 
                         release["config_vars"].each do |key,value|
                             release["config_vars"][key] = String value
