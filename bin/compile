@@ -74,7 +74,7 @@ File::open("#{build_dir}/#{buildpacks_file}", "r") do |buildpacks|
                 `chmod +x ./bin/compile`
                 `chmod +x ./bin/release`
 
-                name = `./bin/detect #{ARGV[0]}`.chomp
+                name = `./bin/detect #{build_dir}`.chomp
                 arrow "#{name} app detected"
 
                 if $?.to_i == 0
