@@ -17,11 +17,11 @@
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
-RELEASE_FILE=$1/.heroku-buildpack-compose_release_info
+RELEASE_FILE="$1/.heroku-buildpack-compose_release_info"
 
-if [ ! -f $RELEASE_FILE ]; then
+if [ ! -f "$RELEASE_FILE" ]; then
     echo " !    Could not find release file" >&2;
     exit 1;
 fi
 
-cat $RELEASE_FILE
+cat "$RELEASE_FILE"
