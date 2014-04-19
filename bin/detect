@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/bin/sh
 # -----------------------------------------------------------------------------
 # A heroku buildpack for composing other buildpacks
 # Copyright (c) 2012 - Ben Mather
@@ -17,12 +17,12 @@
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
-build_dir = ARGV[0]
+BUILD_DIR=$1
 
-if File.exist?("#{build_dir}/.buildpacks")
-    puts "Compose"
-    exit 0
+if [ -f "$BUILD_DIR/.buildbacks" ]; then
+    echo "Compose";
+    exit 0;
 else
-    puts "no"
-    exit 1
-end
+    echo "no";
+    exit 1;
+fi
