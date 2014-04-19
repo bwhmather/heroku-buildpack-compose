@@ -11,7 +11,7 @@ The contents of the `config_vars` key are added to the environment after each st
 Usage
 -----
 
-By default heroku-buildpack-compose reads a list of buildpacks from a `.buildpacks` file in the root of the application repository.  Buildpacks are described by the url of a git repository and spaced one per line.  To read buildpacks from a different file, specify it's path (relative to the repository root) in the `BUILDPACKS_FILE` environment variable (Note: at present, passing configuration to buildpacks through environment variables requires the [user-env-compile](https://devcenter.heroku.com/articles/labs-user-env-compile) labs extension).
+By default heroku-buildpack-compose reads a list of buildpacks from a `.buildpacks` file in the root of the application repository.  Buildpacks are described by the url of a git repository and spaced one per line.  To read buildpacks from a different file, specify it's path (relative to the repository root) in the `BUILDPACKS_FILE` environment variable.
 
 It is highly recommended that you use your own fork as updates may inadvertently break backwards compatibility and heroku provides no obvious way of versioning buildpacks.
 
