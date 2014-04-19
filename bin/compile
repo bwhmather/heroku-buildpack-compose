@@ -42,6 +42,7 @@ end
 
 build_dir = ARGV[0]
 cache_dir = ARGV[1]
+env_dir = ARGV[2]
 
 buildpacks_file = ENV.fetch("BUILDPACKS_FILE", ".buildpacks")
 
@@ -81,7 +82,7 @@ File::open("#{build_dir}/#{buildpacks_file}", "r") do |buildpacks|
                     # run the buildpack
                     arrow "Executing #{name} buildpack"
 
-                    indent `./bin/compile #{build_dir} #{cache_dir} 2>&1`
+                    indent `./bin/compile #{build_dir} #{cache_dir} #{env_dir} 2>&1`
 
                     if $?.to_i != 0
                         error "Child buildpack compile script failed"
@@ -101,16 +102,6 @@ File::open("#{build_dir}/#{buildpacks_file}", "r") do |buildpacks|
 
                         release["default_process_types"].update(
                                     tmp_release["default_process_types"] || {})
-
-                        release["config_vars"].update(
-                                    tmp_release["config_vars"] || {})
-
-                        release["config_vars"].each do |key,value|
-                            release["config_vars"][key] = String value
-                        end
-
-                        # Add new configuration variables to environment
-                        ENV.update(release["config_vars"])
                     else
                         error "No output from child release script.  Ignoring"
                     end
